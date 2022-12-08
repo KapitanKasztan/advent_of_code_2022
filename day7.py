@@ -1030,60 +1030,95 @@ $ ls
 #
 # print(directories)
 
-input_data = '''$ cd /
-$ ls
-dir a
-14848514 b.txt
-8504156 c.dat
-dir d
-$ cd a
-$ ls
-dir e
-29116 f
-2557 g
-62596 h.lst
-$ cd e
-$ ls
-584 i
-$ cd ..
-$ cd ..
-$ cd d
-$ ls
-4060174 j
-8033020 d.log
-5626152 d.ext
-7214296 k'''
+# input_data = '''$ cd /
+# $ ls
+# dir a
+# 14848514 b.txt
+# 8504156 c.dat
+# dir d
+# $ cd a
+# $ ls
+# dir e
+# 29116 f
+# 2557 g
+# 62596 h.lst
+# $ cd e
+# $ ls
+# 584 i
+# $ cd ..
+# $ cd ..
+# $ cd d
+# $ ls
+# 4060174 j
+# 8033020 d.log
+# 5626152 d.ext
+# 7214296 k'''
 
-memory = []
-c = 0
+dirs = {}
+current_dir = []
+
+
 for line in input_data.splitlines():
-    file = line.split(' ')
-    if file[0].isdigit():
-        if len(memory) < c+1:
-            memory.append(0)
-        memory[c] = int(memory[c]) + int(file[0])
-    elif 'cd' in line:
-        c=len(memory)
+    # print(current_dir)
+    if line.startswith('$ cd') and '..' not in line and '/' not in line:
+        exec('dirs' + f'{"".join(current_dir)}["{line[5:]}"] = {dict()}')
+        current_dir.append(f'["{line[5:]}"]')
+    elif not line.startswith('$') and 'dir' not in line:
+        line = line.replace('.', '')
+        # print(line.split(' '))
+        # print('dirs' + f'{"".join(current_dir)}["{line.split(" ")[1]}"] = {line.split(" ")[0]}')
+        exec('dirs' + f'{"".join(current_dir)}["{line.split(" ")[1]}"] = {line.split(" ")[0]}')
+    elif '..' in line:
+        del(current_dir[len(current_dir)-1])
 
-sum = 0
-print(memory)
-for x in memory:
-    if int(x)<100000:
-        print(x)
-        sum+=int(x)
 
-print(sum)
-
-# memory = {}
-# current_directory = ['/']
-# for line in input_data.splitlines():
-#     if line.startswith('$ cd') and '..' not in line and '/' not in line:
+# suma = 0
+# current = 0
 #
-#         memory[line[5:]] = {}
-#         current_directory.append(line[5:])
-#     if '..' in line:
-#         del current_directory[len(current_directory)-1]
-#     if not line.startswith('$'):
-#         s_line = line.split(' ')
-#         memory[]
-# print(memory)
+# def a(d):
+#     my_sum = 0
+#     global suma
+#     for item in d.values():
+#         if type(item) == int:
+#             my_sum += item
+#         if type(item) == dict:
+#             my_sum += a(item)
+#
+#     if my_sum <=100000:
+#         suma+=my_sum
+#     return my_sum
+# a(dirs)
+
+suma = 70000000
+current = 0
+
+def a(d):
+    my_sum = 0
+    global suma
+    for item in d.values():
+        if type(item) == int:
+            my_sum += item
+        if type(item) == dict:
+            a(item)
+
+    suma-=my_sum
+
+a(dirs)
+szukana = 30000000-suma
+kandydaci = []
+
+def f(d):
+    my_sum = 0
+    global szukana
+    for item in d.values():
+        if type(item) == int:
+            my_sum += item
+        if type(item) == dict:
+            my_sum += f(item)
+
+    if my_sum > szukana:
+        kandydaci.append(my_sum)
+    return my_sum
+f(dirs)
+
+print(min(kandydaci))
