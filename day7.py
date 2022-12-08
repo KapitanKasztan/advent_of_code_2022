@@ -1009,116 +1009,65 @@ $ cd szwnlv
 $ ls
 133507 bnmhmpr.vww'''
 
-#
-# directories = {
-#     '/': {}
-# }
-#
-# current_dir = ['/']
-# for file in input_data.splitlines():
-#     print(file)
-#     if file.startswith('dir'):
-#         print()
-#         directories[current_dir[len(current_dir)-1]][file] = {}
-#         print(directories)
-#         current_dir.append(file)
-#     elif not file.startswith('$'):
-#         new_file = file.split(' ')
-#         directories[current_dir[len(current_dir)-1]][new_file[1]] = new_file[0]
-#     elif '..' in file:
-#         del current_dir[len(current_dir)-1]
-#
-# print(directories)
-
-# input_data = '''$ cd /
-# $ ls
-# dir a
-# 14848514 b.txt
-# 8504156 c.dat
-# dir d
-# $ cd a
-# $ ls
-# dir e
-# 29116 f
-# 2557 g
-# 62596 h.lst
-# $ cd e
-# $ ls
-# 584 i
-# $ cd ..
-# $ cd ..
-# $ cd d
-# $ ls
-# 4060174 j
-# 8033020 d.log
-# 5626152 d.ext
-# 7214296 k'''
-
 dirs = {}
 current_dir = []
 
 
 for line in input_data.splitlines():
-    # print(current_dir)
     if line.startswith('$ cd') and '..' not in line and '/' not in line:
         exec('dirs' + f'{"".join(current_dir)}["{line[5:]}"] = {dict()}')
         current_dir.append(f'["{line[5:]}"]')
     elif not line.startswith('$') and 'dir' not in line:
         line = line.replace('.', '')
-        # print(line.split(' '))
-        # print('dirs' + f'{"".join(current_dir)}["{line.split(" ")[1]}"] = {line.split(" ")[0]}')
         exec('dirs' + f'{"".join(current_dir)}["{line.split(" ")[1]}"] = {line.split(" ")[0]}')
     elif '..' in line:
         del(current_dir[len(current_dir)-1])
 
 
-# suma = 0
-# current = 0
-#
-# def a(d):
-#     my_sum = 0
-#     global suma
-#     for item in d.values():
-#         if type(item) == int:
-#             my_sum += item
-#         if type(item) == dict:
-#             my_sum += a(item)
-#
-#     if my_sum <=100000:
-#         suma+=my_sum
-#     return my_sum
-# a(dirs)
+suma = 0
 
-suma = 70000000
-current = 0
-
-def a(d):
+def look_for_directories(d):
     my_sum = 0
     global suma
     for item in d.values():
         if type(item) == int:
             my_sum += item
         if type(item) == dict:
-            a(item)
+            my_sum += look_for_directories(item)
 
-    suma-=my_sum
+    if my_sum <=100000:
+        suma+=my_sum
+    return my_sum
+look_for_directories(dirs)
 
-a(dirs)
-szukana = 30000000-suma
+print(suma)
+
+
+disk_space = 70000000
+def find_free_space(d):
+    global disk_space
+    for item in d.values():
+        if type(item) == int:
+            disk_space -= item
+        if type(item) == dict:
+            find_free_space(item)
+
+
+find_free_space(dirs)
+required_space = 30000000 - disk_space
 kandydaci = []
 
-def f(d):
+def look_for(d):
     my_sum = 0
-    global szukana
     for item in d.values():
         if type(item) == int:
             my_sum += item
         if type(item) == dict:
-            my_sum += f(item)
+            my_sum += look_for(item)
 
-    if my_sum > szukana:
+    if my_sum > required_space:
         kandydaci.append(my_sum)
     return my_sum
-f(dirs)
 
+look_for(dirs)
 print(min(kandydaci))
