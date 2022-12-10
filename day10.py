@@ -297,10 +297,9 @@ values ={
     'addx': 2
 }
 
-
+# 1
 # x = 1
 # cycles = 0
-# data = None
 # looked_for = {20,60,100,140,180,220}
 # suma = 0
 # for line in input_data.splitlines():
@@ -320,53 +319,34 @@ values ={
 # print(suma)
 
 
-
-checker = ['........................................',
-          '........................................',
-          '........................................',
-          '........................................',
-          '........................................',
-          '........................................', ]
-
-for line in range(len(checker)):
-    checker[line] = list(checker[line])
-
-
+2
 screen = ['']
 screen_line = 0
 x = 1
 cycles = 0
-data = None
-looked_for = {40,80,120,160,200,240}
-suma = 0
+
 for line in input_data.splitlines():
     command = line.split(' ')[0]
-    try:
+    if len(line.split(' ')) == 2:
         data = int(line.split(' ')[1])
-    except IndexError:
+    else:
         data = None
 
     for cycle in range(values[command]):
         cycles += 1
-        if x < 1:
-            x+=1
-        elif x == 39:
-            x-=1
-        print(checker[screen_line])
-        if checker[screen_line][x] == '.' or checker[screen_line][x-1] == '.' or checker[screen_line][x+1] == '.':
+
+        if cycles-1 == x or cycles-1 == x-1 or cycles-1 == x+1:
             screen[screen_line] += '#'
-            checker[screen_line][x] = '#'
-            checker[screen_line][x-1] = '#'
-            checker[screen_line][x+1] = '#'
         else:
             screen[screen_line] += '.'
 
-        if cycles in looked_for:
-            suma+=x*cycles
+        if cycles == 40:
             screen_line +=1
             screen.append('')
+            cycles = 0
 
     if data is not None:
         x+= data
 
-print(screen)
+for line in screen:
+    print("".join(line))
